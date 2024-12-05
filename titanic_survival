@@ -1,0 +1,79 @@
+-- 1. What is the survival rate for each passenger class? 
+
+SELECT 
+  Pclass, 
+  COUNT(*) AS total_passengers,  
+  SUM(CASE WHEN Survived = 1 THEN 1 ELSE 0 END) AS survived,  
+  SUM(CASE WHEN Survived = 0 THEN 1 ELSE 0 END) AS not_survived, 
+  SUM(CASE WHEN Survived = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS survival_rate 
+FROM passengers 
+GROUP BY Pclass 
+ORDER BY Pclass; 
+
+-- Passengers in 1st class had a significantly higher chance of survival compared to those in 2nd or 
+3rd class.
+
+-- 2. How did survival rates differ between men and women? 
+SELECT 
+  sex, 
+  COUNT(*) AS total_passengers, 
+  SUM(CASE WHEN survived = 1 THEN 1 ELSE 0 END) AS survived, 
+  SUM(CASE WHEN survived = 0 THEN 1 ELSE 0 END) AS not_survived, 
+  SUM(CASE WHEN survived = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS survival_rate 
+FROM passengers 
+GROUP BY sex 
+
+-- Female passengers had higher chance of survival compared male passengers with survival rate of 
+74.20% and 18.89 respectively.
+
+-- 3. Which age group that has the higher survival rate? 
+SELECT 
+  CASE 
+    WHEN CAST(age AS INTEGER) BETWEEN 0 AND 2 THEN 'Baby' 
+    WHEN CAST(age AS INTEGER) BETWEEN 3 AND 17 THEN 'Child' 
+    WHEN CAST(age AS INTEGER) BETWEEN 18 AND 59 THEN 'Adult' 
+    ELSE 'Elderly' 
+  END AS age_group, 
+  COUNT(*) AS total_passengers, 
+  SUM(CASE WHEN survived = 1 THEN 1 ELSE 0 END) AS survived, 
+  SUM(CASE WHEN survived = 0 THEN 1 ELSE 0 END) AS not_survived, 
+  SUM(CASE WHEN survived = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS survival_rate 
+FROM passengers 
+WHERE Age IS NOT NULL 
+GROUP BY age_group; 
+
+-- Babies and children had significantly higher survival rates compared to adults and the elderly. 
+Babies had the highest survival rate at 62.50%, followed by children at 51.69%, while adults and 
+the elderly faced much lower survival chances at 38.61% and 26.92%, respectively.
+
+-- 4. How many solo travelers survive the incident compared to group travelers?
+
+SELECT 
+  CASE  
+    WHEN (SibSp + Parch) = 0 THEN 'Solo Traveler' 
+    ELSE 'Group Traveler' 
+  END AS travel_type,  
+  COUNT(*) AS total_passengers,  
+  SUM(CASE WHEN Survived = 1 THEN 1 ELSE 0 END) AS survived, 
+  SUM(CASE WHEN Survived = 0 THEN 1 ELSE 0 END) AS not_survived, 
+  SUM(CASE WHEN Survived = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS survival_rate 
+FROM passengers 
+GROUP BY travel_type; 
+
+-- The analysis of survival rates based on travel type shows that group travelers had a higher survival 
+rate of 50.6% compared to solo travelers, with survival rate of 30.4%.
+
+-- 5. Are women from any classes have higher survival rate from men in any classes? 
+
+SELECT 
+  Pclass, 
+  Sex,  
+  COUNT(*) AS total_passengers,  
+  SUM(CASE WHEN Survived = 1 THEN 1 ELSE 0 END) AS survived, 
+  SUM(CASE WHEN Survived = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS survival_rate 
+FROM passengers 
+GROUP BY Pclass, Sex
+
+-- First-class female passengers had the highest survival rate at 96.8%, while first-class male 
+passengers had a much lower rate of 36.9%. In contrast, third-class males had the lowest survival 
+rate at 13.5%. 
