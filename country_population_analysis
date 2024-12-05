@@ -1,0 +1,54 @@
+-- Find Countries with Population Over 50 Million and Fertility Rate Above Average
+
+SELECT name, population, fertility_rate
+FROM countries
+WHERE population > 50000000
+  AND fertility_rate > (
+    SELECT AVG(fertility_rate) FROM countries
+  );
+
+-- Countries with the fastest growing population rate
+
+SELECT 
+	name AS "fastest-growing populations", 
+	percent_one_year_change AS "one year population change (%)" 
+FROM countries 
+WHERE percent_one_year_change > 2 
+ORDER BY percent_one_year_change DESC
+LIMIT 10;
+
+-- Countries with a Fertility Rate Below 2.5, but Net Migration Above the Global Average
+
+SELECT name, fertility_rate, net_migrants
+FROM countries
+WHERE fertility_rate < 2.5
+  AND net_migrants > (
+      SELECT AVG(net_migrants) FROM countries
+  );
+
+
+-- Countries with Positive Population Growth and Density Above Global Average
+
+SELECT name, percent_one_year_change AS growth_rate, density_per_sq_km
+FROM countries
+WHERE percent_one_year_change > 0
+  AND density_per_sq_km > (
+      SELECT AVG(density_per_sq_km) FROM countries
+  );
+
+
+-- Countries with median age in countries with the fertility rates above average
+
+WITH avg_fertility AS (
+    SELECT AVG(fertility_rate) AS avg_rate
+    FROM countries
+)
+SELECT 
+    name, 
+    fertility_rate, 
+    median_age
+FROM countries, avg_fertility
+WHERE fertility_rate > avg_fertility.avg_rate
+ORDER BY fertility_rate DESC;
+
+
